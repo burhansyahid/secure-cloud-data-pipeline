@@ -1,0 +1,6 @@
+pandas==2.2.2
+requests==2.31.0
+oracledb==2.1.2
+dbt-oracle==1.7.1
+SQLAlchemy==2.0.29
+psycopg2-binary==2.9.9
