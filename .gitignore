@@ -1,0 +1,16 @@
+# Python virtual environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# dbt system files & logs
+logs/
+target/
+dbt_packages/
+
+# Sensitive local wallets/configs (even if stored outside, safety first)
+*.zip
+*.sso
+*.ora
+*.pem

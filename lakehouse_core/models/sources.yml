@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: oracle_adw
+    database: G2A6E5FC0178C1B_PORTFOLIODB
+    schema: ADMIN
+    tables:
+      - name: bronze_macro_fred
+        description: "Raw JSON macroeconomic data streamed directly from FRED API"
