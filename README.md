@@ -31,10 +31,10 @@ graph LR
     %% Data Flow
     FRED -->|JSON Payload| Ingest
     Ingest -->|Data Lake Stream| Lake
-    Lake -.->|DBMS_CLOUD (Zero-Copy)| ADW
+    Lake -.->|"DBMS_CLOUD (Zero-Copy)"| ADW
     DBT -->|SQL Transformations| ADW
     ADW -->|mTLS Extraction| Sync
-    Sync -->|pandas to_sql()| Postgres
+    Sync -->|"pandas to_sql()"| Postgres
     Postgres -->|Port 5432| Grafana
 ```
 
