@@ -14,3 +14,12 @@ dbt_packages/
 *.sso
 *.ora
 *.pem
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Secrets
+.env
