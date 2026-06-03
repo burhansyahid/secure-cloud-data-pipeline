@@ -1,6 +1,42 @@
 # 🏛️ Secure Cloud Data Pipeline (Medallion Lakehouse)
 
-![Architecture Diagram](./assets/architecture-diagram.png) *(Note: Replace with your actual diagram link)*
+```mermaid
+graph LR
+    classDef external fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef compute fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef storage fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef docker fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+
+    FRED["🏦 FRED API\n(Macro Data)"]:::external
+
+    subgraph OCI["Oracle Cloud Infrastructure (VCN)"]
+        
+        subgraph Server["Linux Compute Node (Ampere)"]
+            Ingest["🐍 Python Ingestion Worker"]:::compute
+            DBT["⚙️ dbt (Data Build Tool)"]:::compute
+            Sync["🐍 Python Serving Sync"]:::compute
+            
+            subgraph Container["Docker Environment"]
+                Postgres[("🐘 PostgreSQL\n(Serving Layer)")]:::docker
+                Grafana["📊 Grafana\n(BI Dashboard)"]:::docker
+            end
+        end
+
+        subgraph Lakehouse["Oracle Zero-Copy Lakehouse"]
+            Lake[("🪣 OCI Object Storage\n(Bronze Layer)") ]:::storage
+            ADW[("🏛️ Autonomous Data Warehouse\n(Silver & Gold Layer)")]:::storage
+        end
+    end
+
+    %% Data Flow
+    FRED -->|JSON Payload| Ingest
+    Ingest -->|Data Lake Stream| Lake
+    Lake -.->|DBMS_CLOUD (Zero-Copy)| ADW
+    DBT -->|SQL Transformations| ADW
+    ADW -->|mTLS Extraction| Sync
+    Sync -->|pandas to_sql()| Postgres
+    Postgres -->|Port 5432| Grafana
+```
 
 ## 📌 Executive Summary
 This project is an automated, end-to-end Medallion Architecture (Bronze $\rightarrow$ Silver $\rightarrow$ Gold) data pipeline built on **Oracle Cloud Infrastructure (OCI)**. 
@@ -58,47 +94,50 @@ secure-cloud-data-pipeline/
 ├── lakehouse_core/            # dbt project containing Medallion SQL models (Bronze/Silver/Gold)
 ├── sync_gold_layer.py         # Python bridge syncing Oracle ADW to Postgres Serving Layer
 ├── requirements.txt           # Python dependencies
-└── README.md
+└── README.md                  
+```
 
-🚀 Reproducibility (How to Run Locally)
-Prerequisites
-Oracle Cloud Account (Free Tier eligible)
+---
 
-FRED API Key
+## 🚀 Reproducibility (How to Run Locally)
 
-Docker & Docker Compose installed
+### Prerequisites
+* Oracle Cloud Account (Free Tier eligible)
+* FRED API Key
+* Docker & Docker Compose installed
+* Python 3.9+
 
-Python 3.9+
-
-1. Environment Setup
+### 1. Environment Setup
 Clone the repository and install the required dependencies:
-
-Bash
+```bash
 git clone git@github.com:YourUsername/secure-cloud-data-pipeline.git
 cd secure-cloud-data-pipeline
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-2. Configure Secrets
-Set your environment variables (do not commit these to version control):
+```
 
-Bash
+### 2. Configure Secrets
+Set your environment variables (do not commit these to version control):
+```bash
 export FRED_API_KEY="your_api_key"
 export TNS_ADMIN="/path/to/your/oracle/wallet"
 export WALLET_LOCATION="/path/to/your/oracle/wallet"
 export WALLET_PASSWORD="your_wallet_password"
-3. Deploy Infrastructure
-Navigate to the infrastructure/ directory and deploy the OCI resources:
+```
 
-Bash
+### 3. Deploy Infrastructure
+Navigate to the `infrastructure/` directory and deploy the OCI resources:
+```bash
 cd infrastructure
 terraform init
 terraform apply -auto-approve
 cd ..
-4. Run the Pipeline
-Execute the ingestion script, dbt models, and the Postgres sync:
+```
 
-Bash
+### 4. Run the Pipeline
+Execute the ingestion script, dbt models, and the Postgres sync:
+```bash
 # 1. Ingest Data to Data Lake
 python ingestion/ingest_macro.py
 
@@ -110,3 +149,6 @@ cd ..
 
 # 3. Sync Gold Layer to Postgres
 python sync_gold_layer.py
+```
+
+---
