@@ -23,7 +23,7 @@ graph LR
         end
 
         subgraph Lakehouse["Oracle Zero-Copy Lakehouse"]
-            Lake[("🪣 OCI Object Storage\n(Bronze Layer)") ]:::storage
+            Lake[("🪣 OCI Object Storage\n(Bronze Layer)")]:::storage
             ADW[("🏛️ Autonomous Data Warehouse\n(Silver & Gold Layer)")]:::storage
         end
     end
